@@ -7,6 +7,7 @@ class User {
         this._log = log;
         this._rawData = dataRow;
         this._doc = doc;
+        this.dataEntries = [];
 
         try {
             this._log.debug(`Loading user...`);
@@ -21,6 +22,18 @@ class User {
         }
     }
 
+    addEntry(type, date, month, year) {
+        this._log.debug(`Adding entry for user ${this._toString()}: ${type} on ${date}.${month}.${year}`);
+        const newEntry = new Entry(this._log);
+        newEntry.initFromParams(type, date, month, year)
+            .then(() => {
+                this.dataEntries.push(newEntry);
+                this._log.info(`Successfully added entry for user ${this._toString()}: ${type} on ${date}.${month}.${year}`);
+            }).catch( err => {
+                throw new Error(`Unable to add new entry for user ${this._toString()}: ${type} on ${date}.${month}.${year}: ${err}`);
+        });
+    }
+
     async _loadUser() {
         this.firstName = this._rawData[MODEL.first_name];
         validateValue.bind(this)(this.firstName, MODEL.first_name);
@@ -32,8 +45,17 @@ class User {
         validateValue.bind(this)(this.uid, MODEL.uid);
 
         // Getting status of user
-        this.signUpDate = this._rawData[MODEL.signup_date];
-        validateValue.bind(this)(this.signUpDate, MODEL.signup_date);
+        validateValue.bind(this)(this._rawData[MODEL.signup_date], MODEL.signup_date);
+        const signUpDateData = this._rawData[MODEL.signup_date].split(" ")[0].split(".");
+        this.signUpDate = new Date();
+        this.signUpDate.setUTCDate(parseInt(signUpDateData[0]));
+        this.signUpDate.setUTCMonth(parseInt(signUpDateData[1]));
+        this.signUpDate.setUTCFullYear(parseInt(signUpDateData[2]));
+        if(isNaN(this.signUpDate.getTime())) {
+            throw new Error(`Unable to parse signUpDate ${this._rawData[MODEL.signup_date]}`)
+        } else {
+            this._log.debug(`Parsed signup date from ${this._rawData[MODEL.signup_date]} to Day: ${this.signUpDate.getUTCDate()}, Month: ${this.signUpDate.getUTCMonth()}, Year: ${this.signUpDate.getUTCFullYear()}`);
+        }
         this.signOffDate = this._rawData[MODEL.signoff_date];
         validateValue.bind(this)(this.signOffDate, MODEL.signoff_date, true);
         this.membershipType = this._rawData[MODEL.membership_type];
@@ -76,7 +98,6 @@ class User {
     }
 
     async _loadEntries() {
-        this.dataEntries = [];
         this._log.debug(`Loading data entries for user ${this._toString()}...`);
         await validateModel.bind(this)(this.entriesSheet, MODEL.entries_sheet);
 
@@ -89,7 +110,26 @@ class User {
 
 
     _toString() {
-        return `${this.firstName} ${this.lastName} (UID: ${this.uid}, Status ${this.status})`
+        return `${this.firstName} ${this.lastName} (UID: ${this.uid}, Status ${this.status}, ${this.dataEntries.length} data entries)`
+    }
+
+    serialize() {
+        let json = {
+            firstName: this.firstName,
+            lastName: this.lastName,
+            uid: this.uid,
+            status: this.status,
+            signUpDate: {
+                day: this.signUpDate.getUTCDate(),
+                month: this.signUpDate.getUTCMonth(),
+                year: this.signUpDate.getUTCFullYear(),
+            },
+            dataEntries: []
+        };
+        this.dataEntries.forEach(entry => {
+            json.dataEntries.push(entry.serialize());
+        });
+        return json;
     }
 }
 

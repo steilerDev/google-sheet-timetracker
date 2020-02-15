@@ -27,6 +27,8 @@
   },
   "dependencies": {
     "google-spreadsheet": "^3.0.8",
-    "simple-node-logger": "^18.12.24"
+    "simple-node-logger": "^18.12.24",
+    "express": "^4.17.1",
+    "body-parser": "^1.19.0"
   }
 }

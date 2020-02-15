@@ -26,6 +26,47 @@ class DataProvider {
         }
     }
 
+    getUsers() {
+        let users = [];
+        this._users.forEach(user => {
+            users.push({
+                firstName: user.firstName,
+                lastName: user.lastName,
+                uid: user.uid
+            })
+        });
+        return users;
+    }
+
+    getUser(id) {
+        let user = this._users[id];
+        if(user) {
+            this._log.debug(`Serving user with ID ${id} (${user._toString()}`);
+            return user.serialize();
+        } else {
+            this._log.warn(`Unable to find user with id ${id}`);
+            throw new Error(`Unable to find user with id ${id}`);
+        }
+    }
+
+    createEntry(uid, types) {
+        let user = this._users[uid];
+        if(user) {
+            this._log.debug(`Found user with ID ${uid} (${user._toString()}`);
+            const now = new Date(Date.now());
+            const nowDate = now.getDate();
+            const nowMonth = now.getMonth();
+            const nowYear = now.getFullYear();
+            types.forEach(element => {
+                this._log.debug(`Creating entry of type ${element} for ${nowDate}.${nowMonth}.${nowYear}`);
+                user.addEntry(element, nowDate, nowMonth, nowYear);
+            });
+        } else {
+            this._log.warn(`Unable to find user with id ${id}`);
+            throw new Error(`Unable to find user with id ${id}`);
+        }
+    }
+
     async _loadSheet() {
         this._log.debug(`Loading Google Sheet (ID: ${this._conf.sheetId})...`);
         this._doc = new GoogleSpreadsheet(this._conf.sheetId);
@@ -48,7 +89,7 @@ class DataProvider {
         userRows.forEach(userEntry => {
             let newUser = new User(userEntry, this._doc, this._log);
             if(newUser.status === "active") {
-                this._users.push(newUser);
+                this._users[newUser.uid] = newUser;
             } else {
                 this._log.info(`Omitting user ${newUser.firstName} ${newUser.lastName} due to status ${newUser.status}`);
             }
