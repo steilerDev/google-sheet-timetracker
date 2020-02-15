@@ -1,0 +1,14 @@
+{
+    "signup_date": "signup_date",
+    "signoff_date": "signoff_date",
+    "uid": "uid",
+    "first_name": "first_name",
+    "last_name": "last_name",
+    "membership_type": "membership_type",
+    "entries_sheet_id": "entries_sheet_id",
+    "entries_sheet": {
+        "date": "date",
+        "type_of_action": "type_of_action",
+        "confirmed": "confirmed"
+    }
+}
