@@ -1,18 +1,18 @@
 const ENTRY_STATUS = {
     ACCEPTED: "accepted",
     UNCONFIRMED: "unconfirmed",
-    DECLINED: "declined"
+    REJECTED: "rejected"
 };
 
 const MODEL = require('../config/model');
 
 class Entry {
-    constructor(entriesSheet, log) {
-        this._entriesSheet = entriesSheet;
+    constructor(log) {
         this._log = log;
     }
 
     initFromRow(dataRow) {
+        this._rawData = dataRow;
         this._type = dataRow[MODEL.entries_sheet.type_of_action];
         this._status = dataRow[MODEL.entries_sheet.status];
         this._id = dataRow.rowIndex;
@@ -34,8 +34,24 @@ class Entry {
         return this;
     }
 
-    confirmEntry() {
+    acceptEntry() {
+        this._updateStatus(ENTRY_STATUS.ACCEPTED);
+    }
 
+    rejectEntry() {
+        this._updateStatus(ENTRY_STATUS.REJECTED);
+    }
+
+    _updateStatus(newStatus) {
+        this._log.debug(`Updating status of entry ${this.toString()} to ${newStatus}`);
+        this._status = newStatus;
+        this._rawData[MODEL.entries_sheet.status] = newStatus;
+        this._rawData.save()
+            .then(() => {
+                this._log.info(`Successfully updated status of entry ${this.toString()} to ${newStatus}`);
+            }).catch((err) => {
+                throw new Error(`Unable to update status of entry ${this.toString()} to ${newStatus}: ${err}`);
+        });
     }
 
     toString() {

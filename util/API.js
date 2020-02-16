@@ -93,6 +93,8 @@ class API {
          */
         this._api.post('/user/:uid', this._createEntry.bind(this));
 
+        this._api.get('/user/:uid/:eid', this._getEntry.bind(this));
+
         this._log.debug(`API routes successfully initialized!`);
     }
 
@@ -175,6 +177,44 @@ class API {
                 "message": "No array specified"
             });
         }
+    }
+
+    _getEntry(req, res) {
+        try {
+            this._log.debug(`Getting user by ID...`);
+            if(req.params.uid) {
+                let user = this._dataProvider.getUser(req.params.uid);
+                this._log.debug(`Found user ${user.toString()}, getting entry by ID...`);
+                if(req.params.eid) {
+                    let entry = user.getEntry(req.params.eid);
+                    this._log.info(`Transmitting entry ${entry.toString()}`);
+                    res.status(200);
+                    res.send(entry.toJSON());
+                } else {
+                    this._log.error(`Unable to get entry for user ${user.toString()}, Entry-ID parameter is missing: ${JSON.stringify(req.params)}`);
+                    res.status(400);
+                    res.send({
+                        "status": "error",
+                        "message": "Entry-ID parameter is missing"
+                    });
+                }
+            } else {
+                this._log.error(`Unable to get user, User-ID parameter is missing: ${JSON.stringify(req.params)}`);
+                res.status(400);
+                res.send({
+                    "status": "error",
+                    "message": "User-ID parameter is missing"
+                });
+            }
+        } catch (err) {
+            this._log.error(`Unable to get entry with ID ${req.params.eid}: ${err.message}`);
+            res.status(404);
+            res.send({
+                "status": "error",
+                "message": err.message
+            });
+        }
+
     }
 }
 

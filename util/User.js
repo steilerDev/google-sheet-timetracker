@@ -36,7 +36,7 @@ class User {
         types.forEach(element => {
             this._log.debug(`Creating entry of type ${element} on ${nowDate}.${nowMonth}.${nowYear} for user ${this.toString()}`);
             try {
-                let newEntry = new Entry(this.entriesSheet, this._log)
+                let newEntry = new Entry(this._log)
                     .initFromParams(element, nowDate, nowMonth, nowYear);
                 newEntries.push(newEntry.toJSON(true));
                 this._log.debug(`Successfully created new entry for user ${this.toString()}: ${newEntry.toString()}`);
@@ -47,12 +47,21 @@ class User {
 
         this.entriesSheet.addRows(newEntries).then((newRows) => {
             newRows.forEach((element) => {
-                this.dataEntries.push(new Entry(this.entriesSheet, this._log).initFromRow(element));
+                this.dataEntries.push(new Entry(this._log).initFromRow(element));
             });
             this._log.info(`Successful added ${newRows.length} new entries for user ${this.toString()}`);
         }).catch((err) => {
             throw new Error(`Unable to add entries for user ${this.toString()}: ${err}`);
         });
+    }
+
+    getEntry(id) {
+        let searchList = this.dataEntries.filter(value => parseInt(value._id) === parseInt(id));
+        if(searchList.length === 1) {
+            return searchList[0];
+        } else {
+            throw new Error(`Unable to get entry with id ${id}, because search list returned not exactly one item, but ${searchList.length}`);
+        }
     }
 
     listUnconfirmedEntries() {
@@ -132,8 +141,8 @@ class User {
 
         const entryRows = await this.entriesSheet.getRows();
         entryRows.forEach(entry => {
-            let newEntry = new Entry(this.entriesSheet, this._log);
-            newEntry.initFromRow(entry);
+            let newEntry = new Entry(this._log)
+                .initFromRow(entry);
             this.dataEntries.push(newEntry);
         });
         this._log.debug(`Successfully loaded ${this.dataEntries.length} data entries for user ${this.toString()}`)
