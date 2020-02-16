@@ -9,6 +9,6 @@
     "entries_sheet": {
         "date": "date",
         "type_of_action": "type_of_action",
-        "confirmed": "confirmed"
+        "status": "status"
     }
 }

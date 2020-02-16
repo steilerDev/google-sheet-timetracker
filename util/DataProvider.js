@@ -9,60 +9,38 @@ class DataProvider {
         this._log = log;
         this._conf = conf;
         this._credentials = credentials;
+        this.sync();
+    }
+
+    sync() {
         this._users = [];
-
         try {
-
-            this._log.info(`Loading Data Provider...`);
-
+            this._log.info(`Syncing data provider...`);
             this._loadSheet()
                 .then(() => this._loadUsers()
                     .then(() => {
-                        this._log.info(`Successfully loaded Data Provider with ${this._users.length} active users!`);
+                        this._log.info(`Successfully synced data provider with ${this._users.length} active users!`);
                     })
                 );
         } catch(err) {
-            this._log.fatal(`Unable to load Data Provider: ${err}`);
+            this._log.fatal(`Unable to sync data provider: ${err}`);
+            throw new Error(`Unable to sync data provider: ${err}`);
         }
     }
 
     getUsers() {
         let users = [];
-        this._users.forEach(user => {
-            users.push({
-                firstName: user.firstName,
-                lastName: user.lastName,
-                uid: user.uid
-            })
-        });
+        this._users.forEach(element => users.push(element));
         return users;
     }
 
     getUser(id) {
         let user = this._users[id];
         if(user) {
-            this._log.debug(`Serving user with ID ${id} (${user._toString()}`);
-            return user.serialize();
+            this._log.debug(`Serving user with ID ${id} (${user.toString()}`);
+            return user;
         } else {
-            this._log.warn(`Unable to find user with id ${id}`);
-            throw new Error(`Unable to find user with id ${id}`);
-        }
-    }
-
-    createEntry(uid, types) {
-        let user = this._users[uid];
-        if(user) {
-            this._log.debug(`Found user with ID ${uid} (${user._toString()}`);
-            const now = new Date(Date.now());
-            const nowDate = now.getDate();
-            const nowMonth = now.getMonth();
-            const nowYear = now.getFullYear();
-            types.forEach(element => {
-                this._log.debug(`Creating entry of type ${element} for ${nowDate}.${nowMonth}.${nowYear}`);
-                user.addEntry(element, nowDate, nowMonth, nowYear);
-            });
-        } else {
-            this._log.warn(`Unable to find user with id ${id}`);
+            this._log.error(`Unable to find user with id ${id}`);
             throw new Error(`Unable to find user with id ${id}`);
         }
     }
@@ -83,7 +61,7 @@ class DataProvider {
         this._log.debug(`Loading users...`);
         const userTable = this._doc.sheetsByIndex[0];
         await validateModel.bind(this)(userTable, MODEL);
-        await userTable.updateProperties({title: "users"});
+        userTable.updateProperties({title: "users"});
 
         const userRows = await userTable.getRows();
         userRows.forEach(userEntry => {
