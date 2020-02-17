@@ -60,12 +60,12 @@ class User {
         if(searchList.length === 1) {
             return searchList[0];
         } else {
-            throw new Error(`Unable to get entry with id ${id}, because search list returned not exactly one item, but ${searchList.length}`);
+            throw new Error(`Unable to get entry with id ${id} for user ${this.toString()}: Search list returned not exactly one item, but ${searchList.length}`);
         }
     }
 
-    listUnconfirmedEntries() {
-
+    getUnconfirmedEntries() {
+        return this.dataEntries.filter(entry => entry.isUnconfirmed());
     }
 
     async _loadUser() {

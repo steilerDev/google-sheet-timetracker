@@ -95,6 +95,9 @@ class API {
 
         this._api.get('/user/:uid/:eid', this._getEntry.bind(this));
 
+        this._api.post('/admin/:uid/:eid', this._updateEntry.bind(this));
+        this._api.get('/admin', this._getUnconfirmedEntries.bind(this));
+
         this._log.debug(`API routes successfully initialized!`);
     }
 
@@ -214,7 +217,85 @@ class API {
                 "message": err.message
             });
         }
+    }
 
+    _updateEntry(req, res) {
+        try {
+            this._log.debug(`Getting user by ID...`);
+            if(req.params.uid) {
+                let user = this._dataProvider.getUser(req.params.uid);
+                this._log.debug(`Found user ${user.toString()}, getting entry by ID...`);
+                if(req.params.eid) {
+                    let entry = user.getEntry(req.params.eid);
+                    if(req.body.status === "accept") {
+                        entry.acceptEntry();
+                        res.status(200);
+                        res.send(entry.toJSON());
+                    } else if (req.body.status === "reject") {
+                        entry.rejectEntry();
+                        res.status(200);
+                        res.send(entry.toJSON());
+                    } else {
+                        this._log.error(`Unable to update entry ${entry.toString()} for user ${user.toString()}, because new status is unknown: ${req.body.status}`);
+                        res.status(400);
+                            "status": "error",
+                            "message": `Unknown updated status for entry (expected 'accept' or 'reject', got ${req.body.status}`
+                        });
+                    }
+                } else {
+                    this._log.error(`Unable to get entry for user ${user.toString()}, Entry-ID parameter is missing: ${JSON.stringify(req.params)}`);
+                    res.status(400);
+                    res.send({
+                        "status": "error",
+                        "message": "Entry-ID parameter is missing"
+                    });
+                }
+            } else {
+                this._log.error(`Unable to get user, User-ID parameter is missing: ${JSON.stringify(req.params)}`);
+                res.status(400);
+                res.send({
+                    "status": "error",
+                    "message": "User-ID parameter is missing"
+                });
+            }
+        } catch (err) {
+            this._log.error(`Unable to get accept/reject entry with ID ${req.params.eid}: ${err.message}`);
+            res.status(404);
+            res.send({
+                "status": "error",
+                "message": err.message
+            });
+        }
+    }
+
+    _getUnconfirmedEntries(req, res) {
+        try {
+            this._log.debug(`Getting all unconfirmed entries for all users...`);
+            let response = [];
+            let users = this._dataProvider.getUsers();
+
+            users.forEach(user => {
+                let unconfirmedEntries = user.getUnconfirmedEntries();
+                if(unconfirmedEntries.length > 0) {
+                    let userResponse = user.toJSON(true);
+                    userResponse["dataEntries"] = [];
+                    unconfirmedEntries.forEach(entry => userResponse.dataEntries.push(entry.toJSON()));
+                    response.push(userResponse);
+                } else {
+                    this._log.debug(`Omitting user ${user}, due to no unconfirmed entries`);
+                }
+            });
+
+            res.status(200);
+            res.send(response);
+        } catch (err) {
+            this._log.error(`Unable to get all unconfirmed entries: ${err.message}`);
+            res.status(404);
+            res.send({
+                "status": "error",
+                "message": err.message
+            });
+        }
     }
 }
 

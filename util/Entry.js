@@ -42,16 +42,24 @@ class Entry {
         this._updateStatus(ENTRY_STATUS.REJECTED);
     }
 
+    isUnconfirmed() {
+        return this._status === ENTRY_STATUS.UNCONFIRMED;
+    }
+
     _updateStatus(newStatus) {
-        this._log.debug(`Updating status of entry ${this.toString()} to ${newStatus}`);
-        this._status = newStatus;
-        this._rawData[MODEL.entries_sheet.status] = newStatus;
-        this._rawData.save()
-            .then(() => {
-                this._log.info(`Successfully updated status of entry ${this.toString()} to ${newStatus}`);
-            }).catch((err) => {
+        if(this._status === ENTRY_STATUS.ACCEPTED) {
+            throw new Error(`Unable to update status of confirmed entries: ${this.toString()}`);
+        } else {
+            this._log.debug(`Updating status of entry ${this.toString()} to ${newStatus}`);
+            this._status = newStatus;
+            this._rawData[MODEL.entries_sheet.status] = newStatus;
+            this._rawData.save()
+                .then(() => {
+                    this._log.info(`Successfully updated status of entry ${this.toString()} to ${newStatus}`);
+                }).catch((err) => {
                 throw new Error(`Unable to update status of entry ${this.toString()} to ${newStatus}: ${err}`);
-        });
+            });
+        }
     }
 
     toString() {
