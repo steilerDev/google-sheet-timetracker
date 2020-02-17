@@ -238,6 +238,7 @@ class API {
                     } else {
                         this._log.error(`Unable to update entry ${entry.toString()} for user ${user.toString()}, because new status is unknown: ${req.body.status}`);
                         res.status(400);
+                        res.send({
                             "status": "error",
                             "message": `Unknown updated status for entry (expected 'accept' or 'reject', got ${req.body.status}`
                         });
