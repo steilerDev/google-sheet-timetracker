@@ -67,13 +67,13 @@ class API {
          *          },
          *          dataEntries: [
          *              {
+         *                  type: ['errands' | 'catering' | 'work'],
          *                  date: {
          *                      day: day,
          *                      month: month,
          *                      year: year
          *                  },
-         *                  type: type,
-         *                  confirmed: [true | false]
+         *                  status: ['unconfirmed' | 'accepted' | 'rejected']
          *              },
          *              ...
          *          ]
@@ -93,10 +93,69 @@ class API {
          */
         this._api.post('/user/:uid', this._createEntry.bind(this));
 
+        /**
+         * Method: GET
+         * URI: /user/${uid}/${eid}
+         * Returns: A JSON object, containing all data related to the specified entry (by `eid`) for the user specified by `uid`:
+         *      {
+         *          type: ['errands' | 'catering' | 'work'],
+         *          date: {
+         *              day: day,
+         *              month: month,
+         *              year: year
+         *          },
+         *          status: ['unconfirmed' | 'accepted' | 'rejected']
+         *      }
+         */
         this._api.get('/user/:uid/:eid', this._getEntry.bind(this));
 
-        this._api.post('/admin/:uid/:eid', this._updateEntry.bind(this));
+        /**
+         * Method: GET
+         * URI: /admin
+         * Returns: A JSON object, containing all unconfirmed entries of all users.
+         *      Note: User without unconfirmed entries are omitted.
+         *      [
+         *          {
+         *              firstName: firstName,
+         *              lastName: lastName,
+         *              uid: uid,
+         *              status: status, //currently always 'active'
+         *              signUpDate: {
+         *                  day: day,
+         *                  month: month,
+         *                  year: year
+         *              },
+         *              dataEntries: [
+         *                  {
+         *                      type: ['errands' | 'catering' | 'work'],
+         *                      date: {
+         *                          day: day,
+         *                          month: month,
+         *                          year: year
+         *                      },
+         *                      status: 'unconfirmed'
+         *                  },
+         *                  ...
+         *              ]
+         *          },
+         *          {
+         *              firstName: ...
+         *          }
+         */
         this._api.get('/admin', this._getUnconfirmedEntries.bind(this));
+
+        /**
+         * Method: POST
+         * URI: /admin/${uid}/${eid}
+         * Body: An object, describing the new status of the selected entry (specified by eid) of the selected user (uid). Allowd status: "accepted", "rejected".
+         *      Note: An already accepted entry cannot be changed
+         *      { 'status': 'accepted' }
+         * Returns: A JSON object, specifying success:
+         *      { "status": "success" }
+         * or a JSON object specifying error:
+         *      { "status": "error", "message": "error message"}
+         */
+        this._api.post('/admin/:uid/:eid', this._updateEntry.bind(this));
 
         this._log.debug(`API routes successfully initialized!`);
     }
