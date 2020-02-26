@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+var cors = require("cors");
 
 class API {
   constructor(dataProvider, conf, log) {
@@ -9,6 +10,7 @@ class API {
     this._dataProvider = dataProvider;
 
     this._api.use(bodyParser.json());
+    this._api.use(cors());
     this._initRoutes();
   }
 
