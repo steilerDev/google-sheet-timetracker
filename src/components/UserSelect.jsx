@@ -18,24 +18,25 @@ export default () => {
   };
 
   return (
-    <Form.Group controlId="name">
-      <Form.Label>Name</Form.Label>
+    <div>
+      <h2>Strichliste</h2>
       <Form.Control
         as="select"
         option="2"
         onChange={e => onChange(e.target.value)}
+        value="default"
       >
-        <option value="" disabled selected>
+        <option disabled value="default">
           Wähle deinen Namen
         </option>
         {users
           ? users.map(user => (
-              <option value={user.uid}>
+              <option value={user.uid} key={user.uid}>
                 {user.firstName} {user.lastName}
               </option>
             ))
           : ""}
       </Form.Control>
-    </Form.Group>
+    </div>
   );
 };
