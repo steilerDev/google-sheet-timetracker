@@ -4,7 +4,7 @@ const ENTRY_STATUS = {
     REJECTED: "rejected"
 };
 
-const MODEL = require('../config/model');
+const MODEL = require('../../config/model');
 
 class Entry {
     constructor(log) {
