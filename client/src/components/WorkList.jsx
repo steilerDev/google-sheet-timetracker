@@ -10,12 +10,14 @@ import {
   faArrowLeft
 } from "@fortawesome/free-solid-svg-icons";
 
+const BACKEND = require('../../../config/config').backend_url;
+
 export default () => {
   let { uid } = useParams();
   const [work, setWork] = useState();
 
   if (!work) {
-    fetch("http://localhost:3000/users/" + uid)
+    fetch( `${BACKEND}/users/${uid}`)
       .then(resp => resp.json())
       .then(resp => setWork(resp));
   }

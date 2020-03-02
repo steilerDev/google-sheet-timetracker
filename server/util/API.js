@@ -15,22 +15,20 @@ class API {
   }
 
   listen() {
-    this._api.listen(this._conf.port, err => {
+    console.log(JSON.stringify(process.env));
+    const PORT = process.env.PORT || 3000;
+    this._api.listen(PORT, err => {
       if (err) {
         this._log.fatal(`Unable to start web server: ${err}`);
         throw new Error(`Unable to start web server: ${err}`);
       } else {
-        this._log.info(`Web server is listening on port ${this._conf.port}`);
+        this._log.info(`Web server is listening on port ${PORT}`);
       }
     });
   }
 
   _initRoutes() {
     this._log.debug(`Initializing routes for API...`);
-    /**
-     * Static content within the 'html' folder is served to the root of the webserver
-     */
-    this._api.use("/", express.static("html"));
 
     /**
      * Method: GET

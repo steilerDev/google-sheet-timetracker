@@ -5,6 +5,8 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
+const BACKEND = require('../../../config/config').backend_url;
+
 export default () => {
   let { uid } = useParams();
   const [userInfo, setuserInfo] = useState();
@@ -14,7 +16,7 @@ export default () => {
   const [work, setWork] = useState([]);
 
   if (!userInfo) {
-    fetch("http://localhost:3000/users/" + uid)
+    fetch(`${BACKEND}/users/${uid}`)
       .then(resp => resp.json())
       .then(resp => setuserInfo(resp));
   }
@@ -30,7 +32,7 @@ export default () => {
   useEffect(() => {
     if (isLoading) {
       axios
-        .post(`http://localhost:3000/users/${uid}`, work)
+        .post(`${BACKEND}/users/${uid}`, work)
         .then(res => setLoading(false))
         .catch(err => alert("Es ist ein Fehler aufgetreten"));
     }

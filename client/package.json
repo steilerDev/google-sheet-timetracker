@@ -1,9 +1,8 @@
 {
-  "name": "google-sheet-timetracker",
+  "name": "ffnbr-tracker-backend",
   "version": "0.0.1",
-  "description": "A small time tracker application based on a Google Sheets backend",
-  "license": "GPLV3",
-  "preferGlobal": true,
+  "description": "A small tracker application based on a Google Sheets backend",
+  "license": "GPL-3.0-or-later",
   "main": "index.js",
   "author": {
     "email": "frank@steilerdev.de",
@@ -22,27 +21,21 @@
     "url": "https://github.com/steilerDev/google-sheet-timetracker/issues"
   },
   "engines": {
-    "node": ">=13.5.0",
-    "homebridge": ">=0.4.45"
+    "node": ">=13.5.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.27",
     "@fortawesome/free-solid-svg-icons": "^5.12.1",
     "@fortawesome/react-fontawesome": "^0.1.8",
     "axios": "^0.19.2",
-    "body-parser": "^1.19.0",
     "bootstrap": "^4.4.1",
-    "cors": "^2.8.5",
     "create-react-class": "^15.6.3",
-    "express": "^4.17.1",
-    "google-spreadsheet": "^3.0.8",
     "react": "^16.12.0",
     "react-bootstrap": "^1.0.0-beta.16",
     "react-datepicker": "^2.13.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.0",
-    "simple-node-logger": "^18.12.24"
+    "react-scripts": "3.4.0"
   },
   "scripts": {
     "start": "react-scripts start",

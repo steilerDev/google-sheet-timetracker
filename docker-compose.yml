@@ -1,0 +1,28 @@
+version: "3"
+services:
+  frontend:
+    build: ./client
+    container_name: ffnbr_tracker_client
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      PORT: "3000"
+      VIRTUAL_HOST: "tracker.faschingsfreunde-neubrunn.de"
+      VIRTUAL_PORT: "3000"
+    volumes:
+      - ./config:/ffnbr-tracker/config
+  backend:
+    build: ./server
+    container_name: ffnbr_tracker_server
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      VIRTUAL_HOST: "backend.tracker.faschingsfreunde-neubrunn.de"
+      VIRTUAL_PORT: "3000"
+    volumes:
+      - ./config:/ffnbr-tracker/config
+networks:
+  default:
+    external:
+      name: steilerGroup

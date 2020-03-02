@@ -2,7 +2,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { User } = require('./User');
 const { validateModel } = require('./Util');
 
-const MODEL = require('../config/model.json');
+const MODEL = require('../../config/model.json');
 
 class DataProvider {
     constructor(conf, credentials, log) {

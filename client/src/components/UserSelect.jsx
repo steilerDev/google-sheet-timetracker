@@ -3,12 +3,14 @@ import { Form } from "react-bootstrap";
 
 import { useHistory } from "react-router-dom";
 
+const BACKEND = require('../../../config/config').backend_url;
+
 export default () => {
   const [users, setUsers] = useState();
   let history = useHistory();
 
   if (!users) {
-    fetch("http://localhost:3000/users")
+    fetch(`${BACKEND}/users`)
       .then(resp => resp.json())
       .then(resp => setUsers(resp));
   }
