@@ -5,7 +5,7 @@ RUN apt-get update \
         --no-install-recommends \
         --fix-missing \
         --assume-yes \
-            git \
+            git ca-certificates \
         && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN git clone https://github.com/steilerDev/google-sheet-timetracker.git /ffnbr-tracker/
