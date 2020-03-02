@@ -1,4 +1,4 @@
-const MODEL = require('../config/model.json');
+const MODEL = require('../../config/model.json');
 const {validateModel, validateValue} = require('./Util');
 const {Entry} = require('./Entry');
 
